@@ -1,0 +1,35 @@
+{
+  "id": "case_017",
+  "title": "Brain Tumor and Craniotomy",
+  "vignette": "A 47-year-old woman who was previously healthy presents with a 4-month history of headache, with intermittent diplopia and gait disturbance developing over the last month. She is admitted after her family witnesses an acute episode of profound lethargy, altered cognition, and vomiting. Neurologic examination is remarkable for abnormal right-sided cranial nerve V, VII, and VIII function; nystagmus; and ataxic gait. Magnetic resonance imaging (MRI) shows a large, right posterior fossa mass that is only slightly hyperintense on T2-weighted images but is clearly demarcated after the intravenous injection of gadolinium contrast. The impression is of a petroclival meningioma, with mass effect on the pons and fourth ventricle. Magnetic resonance angiogram shows a highly vascular tumor drawing principal blood supply from the ascending pharyngeal branch of the ipsilateral external carotid artery. The patient improves clinically following the administration of dexamethasone and mannitol and the infusion of 3% sodium chloride and is monitored in the neurosurgical intensive care unit (ICU). The day after admission, the patient undergoes uneventful cerebral angiography and partial embolization of the tumor under general anesthesia. She is now scheduled for posterior fossa craniotomy and resection of the tumor.",
+  "examPhases": {
+    "preop": {
+      "timeAllocation": 20,
+      "suggestedQuestions": [
+        "What are the special considerations in preoperative evaluation of this patient?",
+        "How would you manage the intracranial hypertension preoperatively?",
+        "What intraoperative monitoring will you use?",
+        "How will you position the patient, and what are the considerations?"
+      ]
+    },
+    "intraop": {
+      "timeAllocation": 25,
+      "suggestedQuestions": [
+        "What are your anesthetic goals for this craniotomy?",
+        "What monitoring will you use?",
+        "How will you induce anesthesia?",
+        "How will you manage ventilation and CO2?",
+        "What will you do if the brain is tight after dural opening?"
+      ]
+    },
+    "postop": {
+      "timeAllocation": 20,
+      "suggestedQuestions": [
+        "What complications are you most concerned about?",
+        "What monitoring will you require?",
+        "How will you manage postoperative pain?",
+        "How would you manage deteriorating neurologic status?"
+      ]
+    }
+  }
+}
