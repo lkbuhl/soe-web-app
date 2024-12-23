@@ -1,6 +1,180 @@
 import React, { useState, useEffect } from "react";
 import caseData from "./cases/case_017_brain_tumor.json";
 
+const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
+  const phaseResponses = messages.filter(msg => msg.type === "candidate" && msg.phase === phase);
+  const phaseFeedback = {};
+
+  Object.entries(phaseAnswers).forEach(([topic, answerData]) => {
+    const feedbackList = [];
+    const questionText = answerData.question.toLowerCase();
+
+    const relevantResponses = phaseResponses.filter(msg =>
+      msg.text.toLowerCase().includes(questionText) ||
+      answerData.key_concepts.some(concept =>
+        concept.essential_points.some(point =>
+          msg.text.toLowerCase().includes(point.toLowerCase())
+        )
+      )
+    );
+
+    if (relevantResponses.length > 0) {
+      answerData.key_concepts.forEach(concept => {
+        const mentionedPoints = concept.essential_points.filter(point =>
+          relevantResponses.some(response =>
+            response.text.toLowerCase().includes(point.toLowerCase())
+          )
+        );
+
+        if (mentionedPoints.length >= concept.essential_points.length * 0.7) {
+          feedbackList.push({
+            type: 'complete',
+            message: answerData.constructive_feedback.complete,
+            learningPoint: concept.learning_points
+          });
+        } else if (mentionedPoints.length > 0) {
+          feedbackList.push({
+            type: 'partial',
+            message: answerData.constructive_feedback.partial,
+            learningPoint: concept.learning_points
+          });
+        }
+      });
+    } else {
+      feedbackList.push({
+        type: 'partial',
+        message: "Consider exploring this topic further.",
+        learningPoint: answerData.key_concepts[0].learning_points
+      });
+    }
+
+    if (feedbackList.length > 0) {
+      phaseFeedback[topic] = {
+        question: answerData.question,
+        feedback: feedbackList
+      };
+    }
+  });
+
+  return phaseFeedback;
+};
+
+const ExamFeedback = ({ messages, onClose }) => {
+  const [feedbackContent, setFeedbackContent] = useState(null);
+
+  useEffect(() => {
+    const generateFeedback = async () => {
+      try {
+        const response = await fetch('/src/cases/case_017_brain_tumor_answers.json');
+        const answers = await response.json();
+
+        const feedback = {
+          preoperative: analyzePhaseFeedback(messages, answers.preoperative, 'preop'),
+          intraoperative: analyzePhaseFeedback(messages, answers.intraoperative, 'intraop'),
+          postoperative: analyzePhaseFeedback(messages, answers.postoperative, 'postop')
+        };
+
+        setFeedbackContent(feedback);
+      } catch (error) {
+        console.error('Error generating feedback:', error);
+      }
+    };
+
+    generateFeedback();
+  }, [messages]);
+
+  if (!feedbackContent) return <div>Generating feedback...</div>;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '20px'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        maxWidth: '800px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflowY: 'auto'
+      }}>
+        <h2 style={{ marginBottom: '20px', fontSize: '1.5rem', fontWeight: 'bold' }}>
+          Examination Feedback
+        </h2>
+
+        {Object.entries(feedbackContent).map(([phase, content]) => (
+          <div key={phase} style={{ marginBottom: '20px' }}>
+            <h3 style={{
+              fontSize: '1.2rem',
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              textTransform: 'capitalize'
+            }}>
+              {phase} Phase
+            </h3>
+            {Object.entries(content).map(([topic, feedback]) => (
+              <div key={topic} style={{
+                padding: '10px',
+                marginBottom: '10px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '4px'
+              }}>
+                <div style={{ marginBottom: '10px' }}>
+                  <strong>{feedback.question}</strong>
+                </div>
+                {feedback.feedback.map((item, i) => (
+                  <div key={i} style={{
+                    padding: '8px',
+                    marginBottom: '8px',
+                    backgroundColor: item.type === 'complete' ? '#d4edda' : '#fff3cd',
+                    borderRadius: '4px'
+                  }}>
+                    <p>{item.message}</p>
+                    {item.learningPoint && (
+                      <p style={{
+                        marginTop: '4px',
+                        fontStyle: 'italic',
+                        fontSize: '0.9rem',
+                        color: '#666'
+                      }}>
+                        {item.learningPoint}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+
+        <button
+          onClick={onClose}
+          style={{
+            backgroundColor: '#3490dc',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            marginTop: '20px'
+          }}
+        >
+          Close Feedback
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [examState, setExamState] = useState("pre-exam");
   const [messages, setMessages] = useState([]);
@@ -8,9 +182,9 @@ function App() {
   const [jwt, setJwt] = useState(null);
   const [currentPhase, setCurrentPhase] = useState("preop");
   const [questionsInPhase, setQuestionsInPhase] = useState(0);
+  const [showFeedback, setShowFeedback] = useState(false);
 
-  useEffect(() => {
-    const getJwt = async () => {
+  useEffect(() => { const getJwt = async () => {
       try {
         const response = await fetch("/api/get-jwt", { method: "POST" });
         const data = await response.json();
@@ -46,7 +220,7 @@ function App() {
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
     
-    const newMessages = [...messages, { type: "candidate", text: userInput }];
+    const newMessages = [...messages, { type: "candidate", text: userInput, phase: currentPhase }];
     setMessages(newMessages);
     setUserInput("");
 
@@ -152,6 +326,17 @@ function App() {
               </div>
             ))}
           </div>
+          <button
+            onClick={() => setShowFeedback(true)}
+            style={{
+              backgroundColor: "#3490dc",
+              color: "white",
+              padding: "10px 20px",
+              marginTop: "20px"
+            }}
+           >
+            View Feedback
+          </button> 
         </div>
       ) : (
         <div>
@@ -183,6 +368,13 @@ function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {showFeedback && (
+        <ExamFeedback
+          messages={messages}
+          onClose={() => setShowFeedback(false)}
+        />
       )}
     </div>
   );
