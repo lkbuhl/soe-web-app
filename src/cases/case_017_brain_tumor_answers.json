@@ -1,0 +1,408 @@
+{
+  "case_id": "017",
+  "case_type": "brain_tumor",
+  "preoperative": {
+    "evaluation_considerations": {
+      "question": "What are the special considerations in preoperative evaluation of this patient?",
+      "key_concepts": [
+        {
+          "topic": "ICP Status",
+          "essential_points": [
+            "Current ICP level and recent symptoms",
+            "Response to medical management",
+            "Remaining intracranial compliance reserve"
+          ],
+          "learning_points": "Understanding the patient's current ICP status and response to treatment is crucial for planning anesthetic management. Consider both the acute presentation (lethargy, altered cognition, vomiting) and the response to initial therapies (dexamethasone, mannitol, hypertonic saline)."
+        },
+        {
+          "topic": "Tumor Characteristics",
+          "essential_points": [
+            "Petroclival location",
+            "High vascularity",
+            "Mass effect on pons and fourth ventricle",
+            "Recent partial embolization"
+          ],
+          "learning_points": "The tumor location and characteristics significantly impact the anesthetic approach. The petroclival location and brainstem proximity increase risk of autonomic instability. The high vascularity, even post-embolization, influences monitoring needs and blood loss management."
+        },
+        {
+          "topic": "Neurological Status",
+          "essential_points": [
+            "Cranial nerve deficits (V, VII, VIII)",
+            "Nystagmus",
+            "Ataxic gait",
+            "Impact on airway management"
+          ],
+          "learning_points": "Cranial nerve involvement affects both intraoperative monitoring choices and postoperative airway management planning. VII nerve involvement particularly impacts airway protection ability."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your evaluation shows good consideration of how this patient's specific pathology affects anesthetic planning. You've identified the key safety concerns.",
+        "partial": "Consider also how the tumor's location and characteristics affect your anesthetic approach, particularly regarding cranial nerve monitoring and airway management.",
+        "areas_to_explore": "Think about how the combination of increased ICP, tumor vascularity, and brainstem proximity might affect your induction plan."
+      }
+    },
+    "intracranial_hypertension": {
+      "question": "How would you manage the intracranial hypertension preoperatively?",
+      "key_concepts": [
+        {
+          "topic": "Current Medical Management",
+          "essential_points": [
+            "Continue dexamethasone",
+            "Careful mannitol management",
+            "Ongoing 3% sodium chloride therapy",
+            "Monitor clinical response"
+          ],
+          "learning_points": "Patient has shown improvement with current medical management. Continue effective therapies while monitoring for side effects and watching fluid/electrolyte status."
+        },
+        {
+          "topic": "Additional Measures",
+          "essential_points": [
+            "30-degree head elevation",
+            "Avoid venous obstruction",
+            "Regular neurological assessment",
+            "Maintain euvolemia"
+          ],
+          "learning_points": "Position and volume status significantly affect ICP. Simple measures like head elevation can make a substantial difference."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "You've demonstrated understanding of both medical and positioning strategies for ICP management.",
+        "partial": "Consider expanding your approach to include both pharmacologic and positioning strategies.",
+        "areas_to_explore": "How would you modify your management if the patient showed signs of deterioration?"
+      }
+    },
+    "intraoperative_monitoring_plan": {
+      "question": "What intraoperative monitoring will you use?",
+      "key_concepts": [
+        {
+          "topic": "Standard Monitoring",
+          "essential_points": [
+            "Arterial line",
+            "Large-bore IV access",
+            "Consider central line given tumor vascularity",
+            "Temperature monitoring"
+          ],
+          "learning_points": "Invasive arterial monitoring is essential for beat-to-beat management of blood pressure and frequent blood sampling."
+        },
+        {
+          "topic": "Neurophysiologic Monitoring",
+          "essential_points": [
+            "Cranial nerve monitoring (V, VII, VIII)",
+            "BAERs for brainstem function",
+            "SSEPs if needed",
+            "Precordial Doppler for VAE"
+          ],
+          "learning_points": "Choice of monitoring affects anesthetic technique. Need to balance adequate anesthetic depth with ability to monitor neural function."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your monitoring plan appropriately addresses both hemodynamic and neurologic monitoring needs.",
+        "partial": "Consider adding specific neurophysiologic monitoring given the cranial nerve involvement.",
+        "areas_to_explore": "How might your choice of monitoring affect your anesthetic technique?"
+      }
+    },
+    "positioning": {
+      "question": "How will you position the patient, and what are the considerations?",
+      "key_concepts": [
+        {
+          "topic": "Position Selection",
+          "essential_points": [
+            "Park bench or lateral position likely",
+            "Surgical access requirements",
+            "Head fixation considerations",
+            "Airway access"
+          ],
+          "learning_points": "Position must balance surgical access needs with physiologic considerations and ability to manage emergencies."
+        },
+        {
+          "topic": "Risk Mitigation",
+          "essential_points": [
+            "VAE prevention",
+            "Careful padding and positioning",
+            "Venous drainage optimization",
+            "Neck position and carotid flow"
+          ],
+          "learning_points": "Position affects both hemodynamics and risk of complications. VAE risk particularly important with head elevation."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your positioning plan shows good awareness of both surgical needs and patient safety considerations.",
+        "partial": "Consider adding specific measures to prevent positioning-related complications.",
+        "areas_to_explore": "How would you modify positioning if VAE becomes a concern?"
+      }
+    }
+  },
+  "intraoperative": {
+    "anesthetic_goals": {
+      "question": "What are your anesthetic goals for this craniotomy?",
+      "key_concepts": [
+        {
+          "topic": "Brain Protection",
+          "essential_points": [
+            "Maintain adequate CPP",
+            "Control ICP",
+            "Enable neurophysiologic monitoring",
+            "Provide surgical relaxation"
+          ],
+          "learning_points": "Must balance multiple competing goals while maintaining ability to assess neurologic function."
+        },
+        {
+          "topic": "Hemodynamic Management",
+          "essential_points": [
+            "Stable blood pressure",
+            "Avoid hypertensive responses",
+            "Manage blood loss",
+            "Prevent VAE"
+          ],
+          "learning_points": "Stable hemodynamics crucial for brain protection and surgical conditions."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your goals appropriately prioritize brain protection while addressing practical management needs.",
+        "partial": "Consider adding specific hemodynamic targets and how you'll achieve them.",
+        "areas_to_explore": "How would you modify your goals if faced with competing priorities?"
+      }
+    },
+    "monitoring": {
+      "question": "What monitoring will you use?",
+      "key_concepts": [
+        {
+          "topic": "Invasive Monitoring",
+          "essential_points": [
+            "Arterial line",
+            "Consider central line",
+            "Temperature monitoring",
+            "Precordial Doppler"
+          ],
+          "learning_points": "Invasive monitoring essential for tight control and early problem detection."
+        },
+        {
+          "topic": "Neurophysiologic",
+          "essential_points": [
+            "Cranial nerve monitoring",
+            "BAERs",
+            "SSEPs if needed"
+          ],
+          "learning_points": "Monitoring choices affect anesthetic technique and drug selection."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your monitoring plan comprehensively addresses both physiologic and neurologic monitoring needs.",
+        "partial": "Consider adding specific neurologic monitoring given the case complexity.",
+        "areas_to_explore": "How would your anesthetic technique change based on monitoring requirements?"
+      }
+    },
+    "induction": {
+      "question": "How will you induce anesthesia?",
+      "key_concepts": [
+        {
+          "topic": "Induction Approach",
+          "essential_points": [
+            "Smooth induction to avoid ICP spikes",
+            "Adequate preload",
+            "Careful airway management",
+            "Anticipate cranial nerve deficits"
+          ],
+          "learning_points": "Induction must balance smooth transition with maintaining CPP and protecting airway."
+        },
+        {
+          "topic": "Drug Selection",
+          "essential_points": [
+            "Propofol or thiopental",
+            "Short-acting opioid",
+            "Muscle relaxant choice based on monitoring",
+            "Anticipate hemodynamic response"
+          ],
+          "learning_points": "Drug choices affect both immediate stability and ability to monitor later."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your induction plan appropriately addresses the key risks and monitoring needs.",
+        "partial": "Consider adding specific strategies for blood pressure management during induction.",
+        "areas_to_explore": "How would you modify your induction if the patient showed signs of increased ICP?"
+      }
+    },
+    "ventilation": {
+      "question": "How will you manage ventilation and CO2?",
+      "key_concepts": [
+        {
+          "topic": "Ventilation Strategy",
+          "essential_points": [
+            "Initial normocarbia",
+            "Avoid excessive hyperventilation",
+            "Regular blood gas monitoring",
+            "Prepare for surgical requests"
+          ],
+          "learning_points": "CO2 management affects both CBF and surgical conditions. Avoid extremes that might compromise perfusion."
+        },
+        {
+          "topic": "Monitoring and Adjustment",
+          "essential_points": [
+            "Monitor arterial blood gases",
+            "Track end-tidal CO2",
+            "Understand gradient in positioning",
+            "Ready to adjust for brain swelling"
+          ],
+          "learning_points": "Regular assessment of ventilation adequacy and CO2 status essential for brain protection."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your ventilation plan shows good understanding of CO2 management principles.",
+        "partial": "Consider adding specific CO2 targets and monitoring strategy.",
+        "areas_to_explore": "How would you adjust ventilation if brain swelling becomes an issue?"
+      }
+    },
+    "brain_tight": {
+      "question": "What will you do if the brain is tight after dural opening?",
+      "key_concepts": [
+        {
+          "topic": "Immediate Actions",
+          "essential_points": [
+            "Communicate with surgeon",
+            "Check head position",
+            "Temporary hyperventilation",
+            "Review anesthetic depth"
+          ],
+          "learning_points": "Systematic approach to brain swelling essential. Start with simple measures before escalating therapy."
+        },
+        {
+          "topic": "Medical Management",
+          "essential_points": [
+            "Consider additional mannitol",
+            "Ensure adequate anesthesia",
+            "Optimize hemodynamics",
+            "Check surgical causes"
+          ],
+          "learning_points": "Multiple factors can contribute to brain swelling. Address all possible causes."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your approach shows good understanding of both immediate and longer-term management options.",
+        "partial": "Consider adding a systematic approach to identifying and treating causes of brain swelling.",
+        "areas_to_explore": "What would be your next step if initial measures aren't effective?"
+      }
+    }
+  },
+  "postoperative": {
+    "complications": {
+      "question": "What complications are you most concerned about?",
+      "key_concepts": [
+        {
+          "topic": "Critical Concerns",
+          "essential_points": [
+            "Brainstem compression from edema",
+            "Cranial nerve dysfunction",
+            "Airway protection issues",
+            "Delayed hemorrhage"
+          ],
+          "learning_points": "Posterior fossa location makes postoperative swelling particularly dangerous. Early recognition crucial."
+        },
+        {
+          "topic": "Monitoring Needs",
+          "essential_points": [
+            "Frequent neuro checks",
+            "Airway assessment",
+            "Hemodynamic stability",
+            "Pain control adequacy"
+          ],
+          "learning_points": "Regular assessment essential for early detection of complications."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your list of concerns appropriately prioritizes the most dangerous complications.",
+        "partial": "Consider adding specific monitoring strategies for early detection of complications.",
+        "areas_to_explore": "How would you distinguish between different causes of deterioration?"
+      }
+    },
+    "monitoring_requirements": {
+      "question": "What monitoring will you require?",
+      "key_concepts": [
+        {
+          "topic": "Immediate Post-op",
+          "essential_points": [
+            "Frequent neurological exams",
+            "Airway and swallowing assessment",
+            "Hemodynamic monitoring",
+            "Pain assessment"
+          ],
+          "learning_points": "Initial period crucial for detecting complications. ICU monitoring typically required."
+        },
+        {
+          "topic": "Ongoing Assessment",
+          "essential_points": [
+            "Trend neurological status",
+            "Monitor for delayed complications",
+            "Track fluid balance",
+            "Assess readiness for step-down"
+          ],
+          "learning_points": "Systematic monitoring approach helps identify subtle changes early."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your monitoring plan appropriately addresses the key risks in the immediate post-operative period.",
+        "partial": "Consider adding specific neurological monitoring parameters.",
+        "areas_to_explore": "How would you modify monitoring based on intraoperative events?"
+      }
+    },
+    "pain_management": {
+      "question": "How will you manage postoperative pain?",
+      "key_concepts": [
+        {
+          "topic": "Multimodal Approach",
+          "essential_points": [
+            "Regular acetaminophen",
+            "Careful opioid titration",
+            "Consider local anesthetic scalp block",
+            "Avoid oversedation"
+          ],
+          "learning_points": "Balance pain control with need for neurological assessment. Avoid respiratory depression."
+        },
+        {
+          "topic": "Monitoring and Adjustment",
+          "essential_points": [
+            "Regular pain assessments",
+            "Watch sedation level",
+            "Monitor respiratory status",
+            "Adjust based on neurologic status"
+          ],
+          "learning_points": "Pain control important but must not interfere with neuro assessment."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your pain management plan shows good balance between analgesia and safety.",
+        "partial": "Consider adding multimodal approaches to minimize opioid requirements.",
+        "areas_to_explore": "How would you modify pain management if neurological status becomes concerning?"
+      }
+    },
+    "deteriorating_status": {
+      "question": "How would you manage deteriorating neurologic status?",
+      "key_concepts": [
+        {
+          "topic": "Immediate Assessment",
+          "essential_points": [
+            "Rapid neurological examination",
+            "Evaluate airway status",
+            "Check vital signs",
+            "Review recent events"
+          ],
+          "learning_points": "Systematic approach essential. Be prepared for rapid intervention if needed."
+        },
+        {
+          "topic": "Management Steps",
+          "essential_points": [
+            "Consider CT scan",
+            "Notify surgical team",
+            "Prepare for possible return to OR",
+            "Consider need for intubation"
+          ],
+          "learning_points": "Early recognition and rapid response can prevent catastrophic outcomes."
+        }
+      ],
+      "constructive_feedback": {
+        "complete": "Your approach demonstrates appropriate urgency and systematic evaluation.",
+        "partial": "Consider adding specific steps for rapid assessment and intervention.",
+        "areas_to_explore": "What factors would influence your decision for immediate return to OR?"
+      }
+    }
+  }
+}

@@ -39,7 +39,7 @@ function App() {
     setQuestionsInPhase(1);
     setMessages([{
       type: "examiner",
-      text: `${caseData.vignette}\n\nPlease introduce yourself, and then I would like to start by asking: What are the special considerations in preoperative evaluation of this patient?`
+      text: `${caseData.vignette}\n\nI would like to start by asking: What are the special considerations in preoperative evaluation of this patient?`
     }]);
   };
 
