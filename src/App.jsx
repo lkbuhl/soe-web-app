@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import caseData from "./cases/case_017_brain_tumor.json";
+import answersData from "./cases/case_017_brain_tumor_answers.json";
 
 const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
   const phaseResponses = messages.filter(msg => msg.type === "candidate" && msg.phase === phase);
@@ -65,8 +66,7 @@ const ExamFeedback = ({ messages, onClose }) => {
   useEffect(() => {
     const generateFeedback = async () => {
       try {
-        const response = await fetch('/src/cases/case_017_brain_tumor_answers.json');
-        const answers = await response.json();
+        const answers = answersData;
 
         const feedback = {
           preoperative: analyzePhaseFeedback(messages, answers.preoperative, 'preop'),
