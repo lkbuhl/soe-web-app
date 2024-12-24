@@ -8,6 +8,7 @@ const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
     const text = response.toLowerCase();
     const pointText = point.toLowerCase();
 
+    // Common abbreviations and alternate terms
     const alternatives = {
       'intracranial pressure': ['icp'],
       'blood pressure': ['bp'],
@@ -17,56 +18,16 @@ const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
       'external ventricular drain': ['evd'],
     };
 
+    // Direct match
     if (text.includes(pointText)) return true;
+
+    // Check alternatives
     for (const [term, alts] of Object.entries(alternatives)) {
       if (pointText.includes(term) && alts.some(alt => text.includes(alt))) return true;
     }
 
-    return false;
-  };
 
-  const phaseResponses = messages.filter(msg => msg.type === "candidate" && msg.phase === phase);
 
-  // Collect strengths and areas for improvement
-  const strengths = [];
-  const improvements = [];
-
-  Object.entries(phaseAnswers).forEach(([topic, answerData]) => {
-    const questionResponses = phaseResponses.filter(msg => {
-      const msgIndex = messages.findIndex(m => m === msg); const previousMessage = 
-      msgIndex > 0 ? messages[msgIndex - 1] : null; return previousMessage && 
-      previousMessage.text.toLowerCase().includes(answerData.question.toLowerCase());
-    });
-
-    if (questionResponses.length > 0) { 
-      answerData.key_concepts.forEach(concept => {
-        const mentionedPoints = concept.essential_points.filter(point => 
-          questionResponses.some(response => includesKeyPoint(response.text, point))
-        );
-
-        if (mentionedPoints.length > 0) {
-          strengths.push({
-            topic: concept.topic,
-            points: mentionedPoints,
-            context: concept.learning_points
-          });
-        } else {
-          improvements.push({
-            topic: concept.topic,
-            points: concept.essential_points,
-            context: concept.learning_points
-          });
-        }
-      });
-    }
-  });
-
-  return {
-    strengths,
-    improvements,
-    phase
-  };
-};
 
 const ExamFeedback = ({ messages, onClose }) => {
   const [feedbackContent, setFeedbackContent] = useState(null);
@@ -92,51 +53,6 @@ const ExamFeedback = ({ messages, onClose }) => {
   }, [messages]);
 
   if (!feedbackContent) return <div>Generating feedback...</div>;
-
-  // Generate narrative feedback
-  const generateNarrative = () => {
-    const allStrengths = [
-      ...feedbackContent.preoperative.strengths,
-      ...feedbackContent.intraoperative.strengths,
-      ...feedbackContent.postoperative.strengths
-    ];
-
-    const allImprovements = [
-      ...feedbackContent.preoperative.improvements,
-      ...feedbackContent.intraoperative.improvements,
-      ...feedbackContent.postoperative.improvements
-    ];
-
-    // Build narrative based on actual responses
-    let narrative = [];
-
-    // Only mention strengths that were actually demonstrated
-    if (allStrengths.length > 0) {
-      narrative.push(
-        <p>
-          Your responses demonstrated a good understanding of
-          {allStrengths.map(s => ` ${s.topic.toLowerCase()}`).join(', ')}.
-        </p>
-      );
-    }
-
-    // Provide specific suggestions based on what was missed
-    if (allImprovements.length > 0) {
-      narrative.push(
-        <p>
-          Consider expanding your discussion to include
-          {allImprovements.map(i => ` ${i.topic.toLowerCase()}`).join(', ')}.
-          {allImprovements[0].context}
-        </p>
-      );
-    }
-
-    return (
-      <div className="text-lg space-y-4">
-        {narrative}
-      </div>
-    );
-  };
 
   return (
     <div style={{
@@ -164,7 +80,50 @@ const ExamFeedback = ({ messages, onClose }) => {
           Examination Feedback
         </h2>
 
-        {generateNarrative()}
+        {Object.entries(feedbackContent).map(([phase, content]) => (
+          <div key={phase} style={{ marginBottom: '20px' }}>
+            <h3 style={{
+              fontSize: '1.2rem',
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              textTransform: 'capitalize'
+            }}>
+              {phase} Phase
+            </h3>
+            {Object.entries(content).map(([topic, feedback]) => (
+              <div key={topic} style={{
+                padding: '10px',
+                marginBottom: '10px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '4px'
+              }}>
+                <div style={{ marginBottom: '10px' }}>
+                  <strong>{feedback.question}</strong>
+                </div>
+                {feedback.feedback.map((item, i) => (
+                  <div key={i} style={{
+                    padding: '8px',
+                    marginBottom: '8px',
+                    backgroundColor: item.type === 'complete' ? '#d4edda' : '#fff3cd',
+                    borderRadius: '4px'
+                  }}>
+                    <p>{item.message}</p>
+                    {item.learningPoint && (
+                      <p style={{
+                        marginTop: '4px',
+                        fontStyle: 'italic',
+                        fontSize: '0.9rem',
+                        color: '#666'
+                      }}>
+                        {item.learningPoint}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
 
         <button
           onClick={onClose}
