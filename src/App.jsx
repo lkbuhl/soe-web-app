@@ -3,23 +3,31 @@ import caseData from "./cases/case_017_brain_tumor.json";
 import answersData from "./cases/case_017_brain_tumor_answers.json";
 
 const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
-  // Helper function to check if response includes concept
+  // Helper function for key terms with expanded synonyms and related concepts
   const includesKeyPoint = (response, point) => {
     const text = response.toLowerCase();
     const pointText = point.toLowerCase();
 
-    const alternatives = {
-      'intracranial pressure': ['icp'],
-      'blood pressure': ['bp'],
-      'venous air embolism': ['vae'],
-      'cerebral perfusion pressure': ['cpp'],
-      'cerebrospinal fluid': ['csf'],
-      'external ventricular drain': ['evd'],
+    const conceptMap = {
+      'intracranial pressure': ['icp', 'raised pressure', 'herniation', 'papilledema', 'mental status'],
+      'blood pressure': ['bp', 'hypertension', 'hypotension', 'mean arterial', 'cpp'],
+      'venous air embolism': ['vae', 'air embolism', 'venous air'],
+      'cerebral perfusion': ['cpp', 'cerebral blood flow', 'perfusion pressure'],
+      'cranial nerve': ['cn', 'brainstem', 'nerve v', 'nerve vii', 'nerve viii'],
+      'neurological status': ['mental status', 'gcs', 'pupillary', 'cranial nerve', 'consciousness'],
+      'monitoring': ['arterial line', 'evd', 'neuromonitoring', 'ssep', 'baer', 'eeg'],
+      'ventilation': ['co2', 'paco2', 'hyperventilation', 'etco2', 'normocapnea'],
+      'positioning': ['head elevation', 'neck position', 'venous drainage', 'prone', 'park bench']
     };
 
+    // Direct match
     if (text.includes(pointText)) return true;
-    for (const [term, alts] of Object.entries(alternatives)) {
-      if (pointText.includes(term) && alts.some(alt => text.includes(alt))) return true;
+
+    // Check for related concepts
+    for (const [concept, relatedTerms] of Object.entries(conceptMap)) {
+      if (pointText.includes(concept)) {
+        if (relatedTerms.some(term => text.includes(term))) return true;
+      }
     }
 
     return false;
@@ -27,31 +35,46 @@ const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
 
   const phaseResponses = messages.filter(msg => msg.type === "candidate" && msg.phase === phase);
 
-  // Collect strengths and areas for improvement
-  const strengths = [];
-  const improvements = [];
+  const strengths = new Set();
+  const improvements = new Set();
 
   Object.entries(phaseAnswers).forEach(([topic, answerData]) => {
     const questionResponses = phaseResponses.filter(msg => {
-      const msgIndex = messages.findIndex(m => m === msg); const previousMessage = 
-      msgIndex > 0 ? messages[msgIndex - 1] : null; return previousMessage && 
-      previousMessage.text.toLowerCase().includes(answerData.question.toLowerCase());
+      const msgIndex = messages.findIndex(m => m === msg);
+      const previousMessage = msgIndex > 0 ? messages[msgIndex - 1] : null;
+
+      // Match questions more flexibly
+      return previousMessage && previousMessage.text.toLowerCase().includes(
+        answerData.question.toLowerCase().split(' ').slice(0, 5).join(' ')
+      );
     });
 
-    if (questionResponses.length > 0) { 
+    if (questionResponses.length > 0) {
+      // Analyze all responses together for this topic
+      const combinedResponse = questionResponses.map(r => r.text).join(' ');
+
       answerData.key_concepts.forEach(concept => {
-        const mentionedPoints = concept.essential_points.filter(point => 
-          questionResponses.some(response => includesKeyPoint(response.text, point))
+        const mentionedPoints = concept.essential_points.filter(point =>
+          includesKeyPoint(combinedResponse, point)
         );
 
-        if (mentionedPoints.length > 0) {
-          strengths.push({
+        if (mentionedPoints.length >= concept.essential_points.length * 0.6) {
+          // Strong understanding shown
+          strengths.add({
             topic: concept.topic,
             points: mentionedPoints,
             context: concept.learning_points
           });
+        } else if (mentionedPoints.length > 0) {
+          // Partial understanding
+          improvements.add({
+            topic: concept.topic,
+            points: concept.essential_points.filter(p => !mentionedPoints.includes(p)),
+            context: `Consider also ${concept.learning_points}`
+          });
         } else {
-          improvements.push({
+          // Topic not adequately addressed
+          improvements.add({
             topic: concept.topic,
             points: concept.essential_points,
             context: concept.learning_points
@@ -62,8 +85,8 @@ const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
   });
 
   return {
-    strengths,
-    improvements,
+    strengths: Array.from(strengths),
+    improvements: Array.from(improvements),
     phase
   };
 };
@@ -107,36 +130,48 @@ const ExamFeedback = ({ messages, onClose }) => {
       ...feedbackContent.postoperative.improvements
     ];
 
-    // Build narrative based on actual responses
     let narrative = [];
 
-    // Only mention strengths that were actually demonstrated
+    // Acknowledge demonstrated knowledge
     if (allStrengths.length > 0) {
-      narrative.push(
-        <p>
-          Your responses demonstrated a good understanding of
-          {allStrengths.map(s => ` ${s.topic.toLowerCase()}`).join(', ')}.
+      const strengthTopics = allStrengths.map(s => s.topic.toLowerCase());
+      feedback.push(
+        <p key="strengths">
+          Your responses demonstrated comprehensive understanding of
+          {strengthTopics.slice(0, 3).join(', ')}.
+          {allStrengths[0].context}
         </p>
       );
     }
 
-    // Provide specific suggestions based on what was missed
+    // Suggest areas for improvement
     if (allImprovements.length > 0) {
-      narrative.push(
-        <p>
-          Consider expanding your discussion to include
-          {allImprovements.map(i => ` ${i.topic.toLowerCase()}`).join(', ')}.
+      const improvementTopics = allImprovements.map(i => i.topic.toLowerCase());
+      feedback.push(
+        <p key="improvements">
+          To enhance your response, consider expanding your discussion of
+          {improvementTopics.slice(0, 2).join(' and ')}.
           {allImprovements[0].context}
+        </p>
+      );
+    }
+
+    // Add summary if there are both strengths and improvements
+    if (allStrengths.length > 0 && allImprovements.length > 0) {
+      feedback.push(
+        <p key="summary">
+          Overall, your answers showed good clinical reasoning. Continue to develop your knowledge
+          of the connections between different aspects of perioperative management.
         </p>
       );
     }
 
     return (
       <div className="text-lg space-y-4">
-        {narrative}
+        {feedback}
       </div>
     );
-  };
+};
 
   return (
     <div style={{
