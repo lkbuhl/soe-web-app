@@ -7,29 +7,18 @@ const app = express();
 app.use(express.static("dist"));
 app.use(express.json());
 
-app.post("/api/get-jwt", async (req, res) => {
-  try {
-    const response = await axios.post("https://api.dartmouth.edu/api/jwt", null, {
-      headers: {
-        "Authorization": process.env.DARTMOUTH_API_KEY
-      }
-    });
-    res.json(response.data);
-  } catch (error) {
-    console.error("JWT Error:", error.message);
-    res.status(500).json({ error: "Failed to get JWT" });
-  }
-});
-
 app.post("/api/chat", async (req, res) => {
   try {
-    const jwt = req.headers.authorization;
     const response = await axios.post(
-      "https://api.dartmouth.edu/api/ai/tgi/llama-3-8b-instruct/v1/chat/completions",
-      req.body,
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-4",
+        messages: req.body.messages,
+        temperature: 0.7
+      },
       {
         headers: {
-          "Authorization": jwt,
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
           "Content-Type": "application/json"
         }
       }

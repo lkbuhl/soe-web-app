@@ -135,7 +135,7 @@ const ExamFeedback = ({ messages, onClose }) => {
     // Acknowledge demonstrated knowledge
     if (allStrengths.length > 0) {
       const strengthTopics = allStrengths.map(s => s.topic.toLowerCase());
-      feedback.push(
+      narrative.push(
         <p key="strengths">
           Your responses demonstrated comprehensive understanding of
           {strengthTopics.slice(0, 3).join(', ')}.
@@ -147,7 +147,7 @@ const ExamFeedback = ({ messages, onClose }) => {
     // Suggest areas for improvement
     if (allImprovements.length > 0) {
       const improvementTopics = allImprovements.map(i => i.topic.toLowerCase());
-      feedback.push(
+      narrative.push(
         <p key="improvements">
           To enhance your response, consider expanding your discussion of
           {improvementTopics.slice(0, 2).join(' and ')}.
@@ -158,7 +158,7 @@ const ExamFeedback = ({ messages, onClose }) => {
 
     // Add summary if there are both strengths and improvements
     if (allStrengths.length > 0 && allImprovements.length > 0) {
-      feedback.push(
+      narrative.push(
         <p key="summary">
           Overall, your answers showed good clinical reasoning. Continue to develop your knowledge
           of the connections between different aspects of perioperative management.
@@ -168,7 +168,7 @@ const ExamFeedback = ({ messages, onClose }) => {
 
     return (
       <div className="text-lg space-y-4">
-        {feedback}
+        {narrative}
       </div>
     );
 };
