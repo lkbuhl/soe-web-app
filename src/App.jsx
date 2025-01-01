@@ -2,176 +2,50 @@ import React, { useState, useEffect } from "react";
 import caseData from "./cases/case_017_brain_tumor.json";
 import answersData from "./cases/case_017_brain_tumor_answers.json";
 
-const analyzePhaseFeedback = (messages, phaseAnswers, phase) => {
-  // Helper function for key terms with expanded synonyms and related concepts
-  const includesKeyPoint = (response, point) => {
-    const text = response.toLowerCase();
-    const pointText = point.toLowerCase();
-
-    const conceptMap = {
-      'intracranial pressure': ['icp', 'raised pressure', 'herniation', 'papilledema', 'mental status'],
-      'blood pressure': ['bp', 'hypertension', 'hypotension', 'mean arterial', 'cpp'],
-      'venous air embolism': ['vae', 'air embolism', 'venous air'],
-      'cerebral perfusion': ['cpp', 'cerebral blood flow', 'perfusion pressure'],
-      'cranial nerve': ['cn', 'brainstem', 'nerve v', 'nerve vii', 'nerve viii'],
-      'neurological status': ['mental status', 'gcs', 'pupillary', 'cranial nerve', 'consciousness'],
-      'monitoring': ['arterial line', 'evd', 'neuromonitoring', 'ssep', 'baer', 'eeg'],
-      'ventilation': ['co2', 'paco2', 'hyperventilation', 'etco2', 'normocapnea'],
-      'positioning': ['head elevation', 'neck position', 'venous drainage', 'prone', 'park bench']
-    };
-
-    // Direct match
-    if (text.includes(pointText)) return true;
-
-    // Check for related concepts
-    for (const [concept, relatedTerms] of Object.entries(conceptMap)) {
-      if (pointText.includes(concept)) {
-        if (relatedTerms.some(term => text.includes(term))) return true;
-      }
-    }
-
-    return false;
-  };
-
-  const phaseResponses = messages.filter(msg => msg.type === "candidate" && msg.phase === phase);
-
-  const strengths = new Set();
-  const improvements = new Set();
-
-  Object.entries(phaseAnswers).forEach(([topic, answerData]) => {
-    const questionResponses = phaseResponses.filter(msg => {
-      const msgIndex = messages.findIndex(m => m === msg);
-      const previousMessage = msgIndex > 0 ? messages[msgIndex - 1] : null;
-
-      // Match questions more flexibly
-      return previousMessage && previousMessage.text.toLowerCase().includes(
-        answerData.question.toLowerCase().split(' ').slice(0, 5).join(' ')
-      );
-    });
-
-    if (questionResponses.length > 0) {
-      // Analyze all responses together for this topic
-      const combinedResponse = questionResponses.map(r => r.text).join(' ');
-
-      answerData.key_concepts.forEach(concept => {
-        const mentionedPoints = concept.essential_points.filter(point =>
-          includesKeyPoint(combinedResponse, point)
-        );
-
-        if (mentionedPoints.length >= concept.essential_points.length * 0.6) {
-          // Strong understanding shown
-          strengths.add({
-            topic: concept.topic,
-            points: mentionedPoints,
-            context: concept.learning_points
-          });
-        } else if (mentionedPoints.length > 0) {
-          // Partial understanding
-          improvements.add({
-            topic: concept.topic,
-            points: concept.essential_points.filter(p => !mentionedPoints.includes(p)),
-            context: `Consider also ${concept.learning_points}`
-          });
-        } else {
-          // Topic not adequately addressed
-          improvements.add({
-            topic: concept.topic,
-            points: concept.essential_points,
-            context: concept.learning_points
-          });
-        }
-      });
-    }
-  });
-
-  return {
-    strengths: Array.from(strengths),
-    improvements: Array.from(improvements),
-    phase
-  };
-};
-
-const ExamFeedback = ({ messages, onClose }) => {
-  const [feedbackContent, setFeedbackContent] = useState(null);
+const ExamFeedback = ({ messages, jwt, onClose }) => {
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     const generateFeedback = async () => {
       try {
-        const answers = answersData;
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}`
+          },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: "system",
+                content: `You are an experienced examiner for the American Board of Anesthesiology providing feedback on an oral board exam. Review the transcript and provide constructive feedback in narrative form:
+                1. Start with a brief overall assessment of the candidate's performance 
+                2. Highlight 2-3 areas where the candidate demonstrated strong understanding, providing specific examples
+                3. Identify 2-3 key areas for improvement, explaining their clinical importance
+                4. End with specific, actionable recommendations for further study
 
-        const feedback = {
-          preoperative: analyzePhaseFeedback(messages, answers.preoperative, 'preop'),
-          intraoperative: analyzePhaseFeedback(messages, answers.intraoperative, 'intraop'),
-          postoperative: analyzePhaseFeedback(messages, answers.postoperative, 'postop')
-        };
+                Use a conversational tone while maintaining professionalism. Focus on the clinical reasoning and patient safety implications of the candidate's responses.`
+              },
+              {
+                role: "user",
+                content: `Exam transcript: ${JSON.stringify(messages)}
+                Reference material: ${JSON.stringify(answersData)}`
+              }
+            ]
+          })
+        });
 
-        setFeedbackContent(feedback);
+        const data = await response.json();
+        setFeedback(data.choices[0].message.content);
       } catch (error) {
         console.error('Error generating feedback:', error);
       }
     };
 
     generateFeedback();
-  }, [messages]);
+  }, [messages, jwt]);
 
-  if (!feedbackContent) return <div>Generating feedback...</div>;
-
-  // Generate narrative feedback
-  const generateNarrative = () => {
-    const allStrengths = [
-      ...feedbackContent.preoperative.strengths,
-      ...feedbackContent.intraoperative.strengths,
-      ...feedbackContent.postoperative.strengths
-    ];
-
-    const allImprovements = [
-      ...feedbackContent.preoperative.improvements,
-      ...feedbackContent.intraoperative.improvements,
-      ...feedbackContent.postoperative.improvements
-    ];
-
-    let narrative = [];
-
-    // Acknowledge demonstrated knowledge
-    if (allStrengths.length > 0) {
-      const strengthTopics = allStrengths.map(s => s.topic.toLowerCase());
-      narrative.push(
-        <p key="strengths">
-          Your responses demonstrated comprehensive understanding of
-          {strengthTopics.slice(0, 3).join(', ')}.
-          {allStrengths[0].context}
-        </p>
-      );
-    }
-
-    // Suggest areas for improvement
-    if (allImprovements.length > 0) {
-      const improvementTopics = allImprovements.map(i => i.topic.toLowerCase());
-      narrative.push(
-        <p key="improvements">
-          To enhance your response, consider expanding your discussion of
-          {improvementTopics.slice(0, 2).join(' and ')}.
-          {allImprovements[0].context}
-        </p>
-      );
-    }
-
-    // Add summary if there are both strengths and improvements
-    if (allStrengths.length > 0 && allImprovements.length > 0) {
-      narrative.push(
-        <p key="summary">
-          Overall, your answers showed good clinical reasoning. Continue to develop your knowledge
-          of the connections between different aspects of perioperative management.
-        </p>
-      );
-    }
-
-    return (
-      <div className="text-lg space-y-4">
-        {narrative}
-      </div>
-    );
-};
+  if (!feedback) return <div>Generating feedback...</div>;
 
   return (
     <div style={{
@@ -199,7 +73,7 @@ const ExamFeedback = ({ messages, onClose }) => {
           Examination Feedback
         </h2>
 
-        {generateNarrative()}
+        <div className="whitespace-pre-wrap">{feedback}</div>
 
         <button
           onClick={onClose}
@@ -229,7 +103,8 @@ function App() {
   const [questionsInPhase, setQuestionsInPhase] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  useEffect(() => { const getJwt = async () => {
+  useEffect(() => {
+    const getJwt = async () => {
       try {
         const response = await fetch("/api/get-jwt", { method: "POST" });
         const data = await response.json();
@@ -264,7 +139,7 @@ function App() {
 
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
-    
+
     const newMessages = [...messages, { type: "candidate", text: userInput, phase: currentPhase }];
     setMessages(newMessages);
     setUserInput("");
@@ -349,7 +224,7 @@ function App() {
         <div>
           <h1>SOE Simulator</h1>
           <h2>{caseData.title}</h2>
-          <button 
+          <button
             onClick={startExam}
             style={{ backgroundColor: "#3490dc", color: "white", padding: "10px 20px" }}
           >
@@ -379,9 +254,9 @@ function App() {
               padding: "10px 20px",
               marginTop: "20px"
             }}
-           >
+          >
             View Feedback
-          </button> 
+          </button>
         </div>
       ) : (
         <div>
@@ -405,7 +280,7 @@ function App() {
               style={{ flex: 1, padding: "8px" }}
               onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
             />
-            <button 
+            <button
               onClick={handleSubmit}
               style={{ backgroundColor: "#3490dc", color: "white", padding: "8px 16px" }}
             >
@@ -418,6 +293,7 @@ function App() {
       {showFeedback && (
         <ExamFeedback
           messages={messages}
+          jwt={jwt}
           onClose={() => setShowFeedback(false)}
         />
       )}
